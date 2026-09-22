@@ -1,0 +1,8 @@
+# osobní data uživatele - nikdy necommitovat
+data/profil.json
+data/denik.json
+prehled.html
+
+# OS / editor
+.DS_Store
+Thumbs.db

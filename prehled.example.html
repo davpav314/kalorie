@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>fit-poradce – přehled</title>
+<style>
+  :root {
+    --bg: #f6f7f4;
+    --card: #ffffff;
+    --ink: #1f2a20;
+    --muted: #6b7568;
+    --accent: #3f7d4d;
+    --accent-soft: #e4f1e6;
+    --warn: #c1622c;
+    --border: #e4e6df;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Segoe UI", system-ui, sans-serif;
+    padding: 32px 16px 64px;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 1.5rem; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 24px; font-size: 0.95rem; }
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 28px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+  }
+  .card .label { font-size: 0.8rem; color: var(--muted); margin-bottom: 6px; }
+  .card .value { font-size: 1.5rem; font-weight: 600; }
+  .card.zbyva .value { color: var(--accent); }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+  th, td { text-align: left; padding: 10px 14px; font-size: 0.92rem; }
+  th { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+  tr:not(:last-child) td { border-bottom: 1px solid var(--border); }
+  td.kcal, th.kcal { text-align: right; }
+  h2 { font-size: 1.1rem; margin: 0 0 12px; }
+  .history { display: flex; flex-direction: column; gap: 6px; }
+  .bar-row { display: grid; grid-template-columns: 90px 1fr 60px; align-items: center; gap: 10px; font-size: 0.85rem; }
+  .bar-track { background: var(--accent-soft); border-radius: 6px; height: 14px; overflow: hidden; }
+  .bar-fill { background: var(--accent); height: 100%; }
+  .muted { color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Přehled – 22. 9. 2026</h1>
+  <p class="sub">Toto je ukázkový výstup skillu <code>kalorie-doporuceni</code> – reálný <code>prehled.html</code> se generuje z tvých dat v <code>data/</code> (ten soubor se necommituje, obsahuje osobní údaje).</p>
+
+  <div class="cards">
+    <div class="card"><div class="label">Snědeno dnes</div><div class="value">1120 kcal</div></div>
+    <div class="card"><div class="label">Denní cíl</div><div class="value">2050 kcal</div></div>
+    <div class="card zbyva"><div class="label">Zbývá</div><div class="value">930 kcal</div></div>
+  </div>
+
+  <h2>Dnešní položky</h2>
+  <table>
+    <thead><tr><th>Čas</th><th>Položka</th><th class="kcal">kcal</th></tr></thead>
+    <tbody>
+      <tr><td>08:00</td><td>ovesná kaše s banánem</td><td class="kcal">350</td></tr>
+      <tr><td>12:30</td><td>kuřecí prsa s rýží a zeleninou</td><td class="kcal">550</td></tr>
+      <tr><td>16:00</td><td>jablko a hrst mandlí</td><td class="kcal">220</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Posledních 14 dní</h2>
+  <div class="history">
+    <div class="bar-row"><span>22. 9.</span><div class="bar-track"><div class="bar-fill" style="width:55%"></div></div><span class="muted">1120</span></div>
+    <div class="bar-row"><span>21. 9.</span><div class="bar-track"><div class="bar-fill" style="width:96%"></div></div><span class="muted">1970</span></div>
+    <div class="bar-row"><span>20. 9.</span><div class="bar-track"><div class="bar-fill" style="width:88%"></div></div><span class="muted">1810</span></div>
+  </div>
+</div>
+</body>
+</html>

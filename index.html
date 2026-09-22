@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>fit-poradce — tvůj kalorický poradce v Claude Code</title>
+<meta name="description" content="fit-poradce odhadne kalorie toho, co sníš, a poradí, co jíst do konce dne — přímo v Claude Code, bez appky, bez databáze, bez počítání.">
+<style>
+  :root {
+    --bg: #101914;
+    --bg-soft: #16221b;
+    --card: #1b2a21;
+    --ink: #eef4ee;
+    --muted: #9fb3a4;
+    --accent: #7ddc86;
+    --accent-strong: #4fbf62;
+    --border: #26382c;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    line-height: 1.5;
+  }
+  a { color: inherit; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 24px; }
+
+  header {
+    position: sticky; top: 0; z-index: 10;
+    background: rgba(16,25,20,0.85);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--border);
+  }
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; max-width: 980px; margin: 0 auto; }
+  .logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 1.1rem; }
+  .logo .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); }
+  nav .links { display: flex; gap: 24px; font-size: 0.92rem; color: var(--muted); }
+  nav .links a:hover { color: var(--ink); }
+  .cta {
+    background: var(--accent-strong); color: #0a1a0e; font-weight: 600;
+    padding: 9px 18px; border-radius: 999px; text-decoration: none; font-size: 0.9rem;
+    white-space: nowrap;
+  }
+  .cta:hover { background: var(--accent); }
+
+  .hero { padding: 90px 24px 70px; text-align: center; }
+  .badge {
+    display: inline-block; font-size: 0.8rem; color: var(--accent);
+    background: rgba(125,220,134,0.1); border: 1px solid rgba(125,220,134,0.35);
+    padding: 5px 14px; border-radius: 999px; margin-bottom: 22px;
+  }
+  h1 { font-size: clamp(2rem, 5vw, 3.2rem); margin: 0 0 18px; letter-spacing: -0.02em; }
+  h1 span { color: var(--accent); }
+  .lead { color: var(--muted); font-size: 1.15rem; max-width: 620px; margin: 0 auto 34px; }
+  .hero-ctas { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--accent-strong); color: #0a1a0e; font-weight: 700;
+    padding: 14px 26px; border-radius: 10px; text-decoration: none; font-size: 1rem;
+  }
+  .btn-primary:hover { background: var(--accent); }
+  .btn-ghost {
+    border: 1px solid var(--border); color: var(--ink);
+    padding: 14px 26px; border-radius: 10px; text-decoration: none; font-size: 1rem;
+  }
+  .btn-ghost:hover { border-color: var(--accent); }
+
+  .chat-mock {
+    max-width: 560px; margin: 56px auto 0; text-align: left;
+    background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+    padding: 18px; box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+  }
+  .bubble { padding: 11px 15px; border-radius: 12px; margin-bottom: 10px; font-size: 0.92rem; max-width: 85%; }
+  .bubble.user { background: #24352a; margin-left: auto; }
+  .bubble.bot { background: rgba(125,220,134,0.1); border: 1px solid rgba(125,220,134,0.25); }
+  .bubble.bot b { color: var(--accent); }
+
+  section { padding: 70px 0; }
+  .section-title { text-align: center; margin-bottom: 46px; }
+  .section-title h2 { font-size: clamp(1.6rem, 3vw, 2.1rem); margin: 0 0 10px; }
+  .section-title p { color: var(--muted); max-width: 560px; margin: 0 auto; }
+
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .feature {
+    background: var(--bg-soft); border: 1px solid var(--border); border-radius: 14px; padding: 26px;
+  }
+  .feature .icon {
+    width: 42px; height: 42px; border-radius: 10px; background: rgba(125,220,134,0.12);
+    display: flex; align-items: center; justify-content: center; margin-bottom: 16px; font-size: 1.3rem;
+  }
+  .feature h3 { margin: 0 0 8px; font-size: 1.05rem; }
+  .feature p { margin: 0; color: var(--muted); font-size: 0.92rem; }
+
+  .steps { counter-reset: step; display: grid; gap: 18px; max-width: 640px; margin: 0 auto; }
+  .step { display: flex; gap: 16px; align-items: flex-start; }
+  .step .num {
+    flex: none; width: 34px; height: 34px; border-radius: 50%;
+    background: var(--accent-strong); color: #0a1a0e; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; font-size: 0.95rem;
+  }
+  .step h4 { margin: 0 0 4px; font-size: 1rem; }
+  .step p { margin: 0; color: var(--muted); font-size: 0.92rem; }
+
+  .privacy {
+    background: var(--bg-soft); border: 1px solid var(--border); border-radius: 16px;
+    padding: 32px; display: flex; gap: 20px; align-items: flex-start; max-width: 780px; margin: 0 auto;
+  }
+  .privacy .icon { font-size: 1.6rem; }
+  .privacy h3 { margin: 0 0 8px; }
+  .privacy p { margin: 0; color: var(--muted); font-size: 0.95rem; }
+
+  footer {
+    border-top: 1px solid var(--border); padding: 34px 24px; text-align: center;
+    color: var(--muted); font-size: 0.85rem;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+
+  @media (max-width: 760px) {
+    .grid { grid-template-columns: 1fr; }
+    nav .links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav>
+    <div class="logo"><span class="dot"></span> fit-poradce</div>
+    <div class="links">
+      <a href="#funkce">Funkce</a>
+      <a href="#jak-to-funguje">Jak to funguje</a>
+      <a href="#soukromi">Soukromí</a>
+    </div>
+    <a class="cta" href="https://github.com/" target="_blank" rel="noopener">Repozitář na GitHubu</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <span class="badge">Běží přímo v Claude Code — žádná appka navíc</span>
+    <h1>Kalorický deník, který <span>myslí za tebe</span>.</h1>
+    <p class="lead">
+      Napiš, co jsi snědl. fit-poradce to za tebe odhadne, zapíše a na konci
+      dne ti přesně řekne, co si dát, abys udržel svůj kalorický cíl —
+      bez hledání v databázích a bez ručního počítání.
+    </p>
+    <div class="hero-ctas">
+      <a class="btn-primary" href="#jak-to-funguje">Jak to funguje</a>
+      <a class="btn-ghost" href="https://github.com/" target="_blank" rel="noopener">Zdrojový kód</a>
+    </div>
+
+    <div class="chat-mock">
+      <div class="bubble user">Dal jsem si k obědu kuřecí prsa s rýží a zeleninou</div>
+      <div class="bubble bot"><b>fit-poradce:</b> Zapsáno — odhaduji ~550 kcal (40 g bílkovin). Dnešní součet: 900 kcal. Do cíle 2050 kcal ti zbývá 1150 kcal.</div>
+      <div class="bubble user">Co mám jíst do konce dne?</div>
+      <div class="bubble bot"><b>fit-poradce:</b> Na svačinu jogurt s ovocem (~220 kcal), k večeři losos se zeleninou a quinoou (~600 kcal) — doplní ti to bílkoviny a vejdeš se přesně do cíle.</div>
+    </div>
+  </div>
+</section>
+
+<section id="funkce">
+  <div class="wrap">
+    <div class="section-title">
+      <h2>Vše, co potřebuješ pro přehled o jídle</h2>
+      <p>Tři jednoduché funkce, žádné zbytečné klikání.</p>
+    </div>
+    <div class="grid">
+      <div class="feature">
+        <div class="icon">🍽️</div>
+        <h3>Odhad kalorií z popisu</h3>
+        <p>Stačí napsat, co jsi snědl nebo vypil — model odhadne kalorie i makra a rovnou to zapíše do deníku.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">📊</div>
+        <h3>Přehled po položkách i dnech</h3>
+        <p>Kdykoliv vidíš, kolik jsi snědl dnes, po jednotlivých položkách, i jak vypadaly poslední dny.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">🎯</div>
+        <h3>Doporučení na zbytek dne</h3>
+        <p>Na základě tvého profilu a toho, co jsi už snědl, ti poradí konkrétní jídla, aby ses trefil do denního cíle.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="jak-to-funguje">
+  <div class="wrap">
+    <div class="section-title">
+      <h2>Jak to funguje</h2>
+      <p>Žádná instalace appky, žádné účty navíc — jen chat v Claude Code.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="num">1</div>
+        <div><h4>Nastavíš si profil</h4><p>Pohlaví, věk, výška, váha a úroveň pohybu — jednou, pak už se jen doptá, pokud chceš něco změnit.</p></div>
+      </div>
+      <div class="step">
+        <div class="num">2</div>
+        <div><h4>Píšeš, co jíš</h4><p>Průběžně během dne napíšeš, co jsi snědl nebo vypil — v jedné větě, přirozeně.</p></div>
+      </div>
+      <div class="step">
+        <div class="num">3</div>
+        <div><h4>Dostaneš přehled a radu</h4><p>Kdykoliv se zeptáš na dnešní součet nebo na to, co jíst do konce dne, abys udržel svůj cíl.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="soukromi">
+  <div class="wrap">
+    <div class="privacy">
+      <div class="icon">🔒</div>
+      <div>
+        <h3>Tvoje data zůstávají tvoje</h3>
+        <p>Profil a deník se ukládají jen lokálně jako obyčejné JSON soubory ve tvém projektu a nikdy se necommitují do repozitáře — sdílí se jen struktura a ukázková data, ne tvoje skutečná čísla.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  fit-poradce — osobní projekt, běží v <a href="https://claude.com/claude-code" target="_blank" rel="noopener">Claude Code</a>.
+</footer>
+
+</body>
+</html>

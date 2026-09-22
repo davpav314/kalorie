@@ -1,0 +1,34 @@
+{
+  "2026-09-22": {
+    "polozky": [
+      {
+        "cas": "08:00",
+        "popis": "ovesná kaše s banánem",
+        "kcal": 350,
+        "bilkoviny_g": 10,
+        "sacharidy_g": 60,
+        "tuky_g": 8,
+        "poznamka": "odhad porce ~350 g kaše + 1 banán"
+      },
+      {
+        "cas": "12:30",
+        "popis": "kuřecí prsa s rýží a zeleninou",
+        "kcal": 550,
+        "bilkoviny_g": 40,
+        "sacharidy_g": 55,
+        "tuky_g": 15,
+        "poznamka": "odhad porce ~150 g kuřete, 150 g rýže"
+      },
+      {
+        "cas": "16:00",
+        "popis": "jablko a hrst mandlí",
+        "kcal": 220,
+        "bilkoviny_g": 6,
+        "sacharidy_g": 22,
+        "tuky_g": 13,
+        "poznamka": ""
+      }
+    ],
+    "celkem_kcal": 1120
+  }
+}
